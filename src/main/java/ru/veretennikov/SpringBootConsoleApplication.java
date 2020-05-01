@@ -25,13 +25,10 @@ public class SpringBootConsoleApplication implements CommandLineRunner{
         LOG.info("APPLICATION FINISHED");
     }
 
-
     @Override
     public void run(String... args) {
-
         LOG.info("EXECUTING : command line runner");
         prepareMusicService.execute();
-
     }
 
 }

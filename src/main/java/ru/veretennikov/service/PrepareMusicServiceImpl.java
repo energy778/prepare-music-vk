@@ -6,50 +6,47 @@ import ru.veretennikov.config.AppProperty;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class PrepareMusicServiceImpl implements PrepareMusicService {
 
+    private static final String OTHER_INFORMATION = "#EXTINF:-1,";
     private final AppProperty appProperty;
 
     @Override
     public void execute() {
 
-        String[] trashArr = new String[] {"#EXTM3U", "#EXTINF:-1,"};
-        List<String> source = new ArrayList();
+//        читаем информацию о текущем плейлисте
+        Map<String, String> source;
+        String fileInput = appProperty.getFileInput();
+        source = readFileToMap(fileInput);
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(appProperty.getFileInput()))) {
-            String s;
-            while(( s = reader.readLine()) != null){
-                for (String searchWord : trashArr) {
-                    s = s.replace(searchWord, "");
-                    if (s.isEmpty())
-                        break;
-                }
-                if (s.isEmpty())
-                    continue;
-                source.add(s);
+//        читаем информацию о скачанных ранее треках
+        List<Map<String, String>> previouslyUploadedFiles = new ArrayList<>();
+        if (appProperty.getPreviouslyUploadedFiles() != null){
+            for (String previouslyUploadedFile : appProperty.getPreviouslyUploadedFiles()) {
+                previouslyUploadedFiles.add(readFileToMap(previouslyUploadedFile));
             }
         }
-        catch(IOException ex){
-            System.out.println(ex.getMessage());
-        }
 
-        int countOfSongs = source.size() / 2;
-        if (source.size() % 2 != 0){
-            source.remove(source.size() -1);
-            countOfSongs = source.size() / 2;
-        }
+//        исключаем скачанные ранее треки
+        removeDuplicates(source, previouslyUploadedFiles);
 
+//        считаем количество уникальных песен
+        int countOfSongs = source.size();
+
+//        формируем файл для менеджера закачек
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(appProperty.getFileOutput()))) {
 
             writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             writer.append(System.lineSeparator());
             writer.write("<DownloadList  Version=\"6\"");
             writer.append(System.lineSeparator());
-            writer.write(String.format("   NextID=\"%s\">", countOfSongs +1));
+            writer.write(String.format("   NextID=\"%s\">", countOfSongs+1));
             writer.append(System.lineSeparator());
             writer.flush();
 
@@ -57,20 +54,19 @@ public class PrepareMusicServiceImpl implements PrepareMusicService {
             String url;
             String baseDir = appProperty.getBaseDir();
 
-            int id = 1;
+            int id = 0;
 
-            for (int i = 0; i < source.size(); i+=2, id++) {
+            for (Map.Entry<String, String> entry : source.entrySet()) {
 
-                songName = source.get(i);
-                url = source.get(i+1);
+                id++;
 
                 writer.write(" <DownloadFile>");
                 writer.append(System.lineSeparator());
                 writer.write(String.format("         <ID>%d</ID>", id));
                 writer.append(System.lineSeparator());
-                writer.write(String.format("         <URL>%s</URL>", url));
+                writer.write(String.format("         <URL>%s</URL>", entry.getValue()));
                 writer.append(System.lineSeparator());
-                writer.write(String.format("         <FileName>%s</FileName>", baseDir + songName));
+                writer.write(String.format("         <FileName>%s</FileName>", baseDir + entry.getKey()));
                 writer.append(System.lineSeparator());
                 writer.write("         <State>0</State>");
                 writer.append(System.lineSeparator());
@@ -108,6 +104,63 @@ public class PrepareMusicServiceImpl implements PrepareMusicService {
         catch(IOException ex){
             System.out.println(ex.getMessage());
         }
+
+    }
+
+    private Map<String, String> readFileToMap(String fileInput) {
+
+        System.out.println(String.format("Читаем файл %s", fileInput));
+
+        Map<String, String> source = new HashMap<>();;
+        int countSong = 0;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileInput))) {
+//            первая строка - служебная . пропускаем
+            String s = reader.readLine();
+
+            if (s != null){
+
+                while (( s = reader.readLine()) != null){
+
+                    String name = s.replace(OTHER_INFORMATION, "");
+
+                    String url;
+                    if ((url = reader.readLine()) != null){
+                        source.put(name, url);
+                        countSong++;
+                    }
+
+                }
+
+            }
+
+        }
+        catch(IOException ex){
+            System.out.println(ex.getMessage());
+        }
+
+        System.out.println(String.format("Найдено треков: %d", countSong));
+        System.out.println(String.format("Из них уникальных: %d", source.size()));
+
+        return source;
+
+    }
+
+    private void removeDuplicates(Map<String, String> source, List<Map<String, String>> previouslyUploadedFiles) {
+
+        if (source == null || source.isEmpty() || previouslyUploadedFiles == null)
+            return;
+
+        System.out.println(String.format("Отсеиваем ранее скачанные"));
+        System.out.println(String.format("До обработки: %d", source.size()));
+
+        for (Map<String, String> previouslyUploadedFile : previouslyUploadedFiles) {
+            for (String songName : previouslyUploadedFile.keySet()) {
+                source.remove(songName);
+            }
+        }
+
+        System.out.println(String.format("После обработки: %d", source.size()));
 
     }
 
