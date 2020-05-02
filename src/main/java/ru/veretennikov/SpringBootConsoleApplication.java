@@ -25,9 +25,6 @@ public class SpringBootConsoleApplication implements CommandLineRunner{
     @Override
     public void run(String... args) {
         logger.info("EXECUTING : command line runner");
-        String s = "Всё идет по плану";
-        System.out.println(s);
-        logger.info(s);
         prepareMusicService.execute();
     }
 

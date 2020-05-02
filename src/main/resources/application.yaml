@@ -1,13 +1,13 @@
 application:
-#  файл со списком всех песен
+#  актуальный плейлист
   file-input: C:\Users\User\Desktop\Новая папка\1992.m3u
 #  предыдущие плейлисты (для исключения дублей в пересекающихся файлах)
   previouslyUploadedFiles:
     - C:\Users\User\Desktop\Новая папка\1143.m3u
     - C:\Users\User\Desktop\Новая папка\222.m3u
-#  файл для менеджера закачек
+#  выходной файл (для менеджера закачек)
   file-output: C:\Users\User\Desktop\Новая папка\список закачек Download Master.xml
-#  директорию для скачанной музыки
+#  директория для скачанной музыки
   base-dir: D:\music\out\
 
 spring:
