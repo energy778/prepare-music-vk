@@ -17,9 +17,9 @@ public class SpringBootConsoleApplication implements CommandLineRunner{
     private final PrepareMusicService prepareMusicService;
 
     public static void main(String[]args) {
-        logger.info("STARTING THE APPLICATION");
+        logger.info("---------------- STARTING THE APPLICATION ----------------");
         SpringApplication.run(SpringBootConsoleApplication.class, args);
-        logger.info("APPLICATION FINISHED");
+        logger.info("---------------- APPLICATION FINISHED ----------------");
     }
 
     @Override

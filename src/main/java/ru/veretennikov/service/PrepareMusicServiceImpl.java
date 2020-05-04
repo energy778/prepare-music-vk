@@ -45,7 +45,7 @@ public class PrepareMusicServiceImpl implements PrepareMusicService {
 
         logger.info("Читаем файл: {}", fileInput);
 
-        Map<String, String> source = new HashMap<>();
+        Map<String, String> source = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         int countSong = 0;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(fileInput))) {
