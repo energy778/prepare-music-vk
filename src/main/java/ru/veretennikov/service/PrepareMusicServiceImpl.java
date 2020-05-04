@@ -37,7 +37,7 @@ public class PrepareMusicServiceImpl implements PrepareMusicService {
         removeDuplicates(source, previouslyUploadedFiles);
 
 //        формируем файл для менеджера закачек
-        writeMapToFile(source);
+        writeMapToTxtnFile(source);
 
     }
 
@@ -99,7 +99,28 @@ public class PrepareMusicServiceImpl implements PrepareMusicService {
 
     }
 
-    private void writeMapToFile(Map<String, String> source) {
+    private void writeMapToTxtnFile(Map<String, String> source) {
+
+        try (BufferedWriter writer = new BufferedWriter(new PrintWriter(appProperty.getFileOutput(), "Cp1251"))) {
+
+            for (Map.Entry<String, String> entry : source.entrySet()) {
+                writer.write(String.format("%s; %s", entry.getValue(), entry.getKey()));
+                writer.append(System.lineSeparator());
+                writer.flush();
+            }
+
+            writer.append(System.lineSeparator());
+            writer.flush();
+
+        }
+        catch(IOException ex){
+            logger.error(ex.getMessage());
+        }
+
+    }
+
+    @Deprecated
+    private void writeMapToXmlFile(Map<String, String> source) {
 
         Locale loc = Locale.US;
         Date curDate = new Date();

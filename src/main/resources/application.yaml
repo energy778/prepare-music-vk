@@ -1,12 +1,12 @@
 application:
 #  актуальный плейлист
-  file-input: C:\Users\User\Desktop\Новая папка\1992.m3u
+  file-input: C:\Users\User\Desktop\Новая папка\417.m3u
 #  предыдущие плейлисты (для исключения дублей в пересекающихся файлах)
   previouslyUploadedFiles:
     - C:\Users\User\Desktop\Новая папка\1143.m3u
-    - C:\Users\User\Desktop\Новая папка\222.m3u
+    - C:\Users\User\Desktop\Новая папка\1992.m3u
 #  выходной файл (для менеджера закачек)
-  file-output: C:\Users\User\Desktop\Новая папка\список закачек Download Master.xml
+  file-output: C:\Users\User\Desktop\Новая папка\список закачек Download Master.txtn
 #  директория для скачанной музыки
   base-dir: D:\music\out\
 

@@ -11,5 +11,5 @@
 Для корректного отображения русских символов в консоли windows надо запускать с указанием кодировки в параметре запуска, например:
 
 ```
-java -jar -Dfile.encoding=cp866 target\prepareMusicVK-1.0-SNAPSHOT.jar
+java -jar -Dfile.encoding=cp866 prepare-music-VK-1.1.jar
 ```
